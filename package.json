@@ -15,6 +15,7 @@
     "@sentry/vite-plugin": "^2.20.1",
     "@sentry/vue": "^8.15.0",
     "logrocket": "^8.1.0",
+    "pdf-lib": "^1.17.1",
     "pinia": "^2.1.7",
     "vue": "^3.4.29",
     "vue-router": "^4.4.0"
