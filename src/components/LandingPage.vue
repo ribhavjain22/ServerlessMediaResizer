@@ -1,30 +1,26 @@
 <template>
   <div class="landing-page">
     <header class="navbar">
-      <router-link to="/" class="navbar-brand">ConvertEase</router-link>
+      <a href="#" class="navbar-brand">ConvertEase</a>
       <nav class="navbar-nav">
         <ul class="navbar-nav">
-          <li class="nav-item"><router-link to="/" class="nav-link">Home</router-link></li>
-          <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-        </ul>
+        <li class="nav-item"><a href="#" class="nav-link" @click.prevent="navigate('LandingPage')">Home</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
+      </ul>
       </nav>
     </header>
 
-    <main>
+    <main id="app">
       <section class="columns">
         <div class="column image-conversion">
           <h2>Image Conversion</h2>
           <p>Resize images to various dimensions with ease and reduce them to the size you want!</p>
-          <router-link to="/image-converter">
-            <button>Go to Image Converter</button>
-          </router-link>
+          <button @click="navigate('ImageConverter')">Go to Image Converter</button>
         </div>
         <div class="column pdf-conversion">
           <h2>PDF Conversion</h2>
           <p>Reduce the size of your PDFs without any hassle in browser itself ensuring privacy of data.</p>
-          <router-link to="/pdf-converter">
-            <button>Go to PDF Converter</button>
-          </router-link>
+          <button @click="navigate('PdfConverter')">Go to PDF Converter</button>
         </div>
       </section>
     </main>
@@ -33,7 +29,12 @@
 
 <script>
 export default {
-  name: 'LandingPage'
+  name: 'LandingPage',
+  methods: {
+    navigate(route) {
+      this.$router.push({ name: route });
+    }
+  }
 }
 </script>
 

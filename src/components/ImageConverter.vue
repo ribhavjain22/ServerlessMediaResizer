@@ -2,10 +2,10 @@
   <div id="app">
     <!-- Navbar -->
     <nav class="navbar">
-      <router-link to="/" class="navbar-brand">Image App</router-link>
+      <a href="/" class="navbar-brand">Image App</a>
       <ul class="navbar-nav">
-        <li class="nav-item"><router-link to="/" class="nav-link">Home</router-link></li>
-        <li class="nav-item"><router-link to="/features" class="nav-link">Features</router-link></li>
+        <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
       </ul>
     </nav>
 
