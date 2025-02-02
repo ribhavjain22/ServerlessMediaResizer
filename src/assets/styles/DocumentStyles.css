@@ -1,0 +1,185 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+}
+
+.file-info {
+  margin-top: -150px;
+  margin-bottom: 70px;
+  position: absolute;
+  margin-left: -240px;
+  text-align: center;
+  width: 100%;
+  font-size: large;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: #007bff;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  color: white;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navbar-nav {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin-left: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #007bff;
+  border-radius: 10px;
+  padding: 40px;
+  width: 400%;
+  max-width: 900px;
+  height: 400px;
+  margin-bottom: 20px;
+  margin-left: 80px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+.upload-container:hover {
+  background-color: #f0f8ff;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.upload-label input[type="file"] {
+  display: none;
+}
+
+.upload-label .button {
+  display: inline-block;
+  padding: 10px 20px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.upload-label .button:hover {
+  background-color: #0056b3;
+}
+
+.input-width {
+  width: 100%;
+  margin-bottom: -1px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  margin-left: 350px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.compress-button {
+  padding: 10px 20px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: -680px;
+  margin-top: 50px;
+  margin-bottom: 10px;
+}
+
+.compress-button:hover {
+  background-color: #0056b3;
+}
+
+.download-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 150px;
+  margin-right: 2100px;
+}
+
+.download-section .button {
+  margin-top: 10px;
+}
+
+
+.downloading-message {
+  color: green;
+  font-size: 14px;
+  margin-top: 170px;
+  margin-left: 110px;
+  margin-bottom: -12px;
+}
+
+
+.upload {
+  margin-left: -10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px 30px;
+}
+
+.download-messagee {
+  color: green;
+  font-size: 18px;
+  margin-top: 170px;
+  margin-left: 110px;
+  margin-bottom: -12px;
+  max-width: 400px;
+
+}
