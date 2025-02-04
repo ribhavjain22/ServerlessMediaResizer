@@ -2,6 +2,7 @@
 
 import { PDFDocument, PDFName, PDFStream, PDFDict } from 'pdf-lib';
 import Logger from './Error/Logger';
+import { _GSPS2PDF } from '../ghostscript-utils'; // Import your Ghostscript wrapper
 
 const logger = new Logger('pdfconverter.vue');
 
@@ -289,6 +290,49 @@ function getImageScale(options) {
     'LOW': 0.9
   };
   return scaleMap[options.level] || 0.7;
+}
+
+export async function compressPDFWithGhostscript(pdfUrl, filename, options, onLoadComplete, onProgress, onStatusUpdate) {
+  try {
+    // 1. Fetch the PDF
+    const response = await fetch(pdfUrl);
+    const pdfBuffer = await response.arrayBuffer();
+
+    // 2. Load with pdf-lib (if you want to do any pdf-lib-based manipulations first)
+    const pdfDoc = await PDFDocument.load(pdfBuffer);
+    // ... Perform any pdf-lib manipulation, optimization, etc. ...
+
+    // 3. Save resulting PDF
+    const partialPdf = await pdfDoc.save({
+      useObjectStreams: true,
+      compress: true
+    });
+
+    // 4. Create a Blob / Object URL so Ghostscript can read it
+    const blob = new Blob([partialPdf], { type: 'application/pdf' });
+    const intermediateUrl = URL.createObjectURL(blob);
+
+    // 5. Call Ghostscript (i.e. _GSPS2PDF) to apply further compression
+    _GSPS2PDF(
+      { psDataURL: intermediateUrl, url: pdfUrl },
+      (result) => {
+        onLoadComplete({
+          pdfDataURL: result.pdfDataURL,
+          finalSize: null, // or you can fetch the size if desired
+          targetReached: true
+        });
+      },
+      (completed, current, total) => {
+        // progress callback
+        onProgress?.(completed ? 100 : (current / total) * 100);
+      },
+      onStatusUpdate,
+      options.level // COMPRESSION_LEVEL.LOW / MEDIUM / HIGH
+    );
+  } catch (error) {
+    console.error('Error during Ghostscript compression:', error);
+    throw error;
+  }
 }
 
 export { compressPDF };

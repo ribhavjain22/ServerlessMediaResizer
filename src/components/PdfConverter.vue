@@ -45,7 +45,7 @@
 
 <script>
 import { ref, computed } from 'vue';
-import { compressPDF } from '../helpers/PdfHelper';
+import { compressPDF, compressPDFWithGhostscript } from '../helpers/PdfHelper';
 import { PdfData } from '../models/pdf/PdfModel';
 import { COMPRESSION_STATE } from '../models/ENUM/COMPRESSION_STATE';
 import { COMPRESSION_LEVEL } from '../models/ENUM/COMPRESSION_LEVEL';
@@ -103,7 +103,7 @@ export default {
 
       state.value = COMPRESSION_STATE.COMPRESSION_IN_PROGRESS;
       try {
-        await compressPDF(
+        await compressPDFWithGhostscript(
           file.value.url,
           file.value.filename,
           { mode: 'preset', level: compressionLevel.value },
