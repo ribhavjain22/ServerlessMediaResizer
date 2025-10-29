@@ -2,7 +2,7 @@
   <div id="app">
     <!-- Navbar -->
     <nav class="navbar">
-      <a href="/" class="navbar-brand">Image App</a>
+      <a href="/" class="navbar-brand">ConvertEase</a>
       <ul class="navbar-nav">
         <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
         <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
@@ -11,41 +11,92 @@
 
     <div class="content">
       <div v-if="!isImageLoaded" class="upload-container">
-        <div class="drag-drop-area" @drop.prevent="handleFileDrop" @dragover.prevent>
-          <label class="upload-label">
-            <input type="file" @change="handleFileSelection" accept="image/*"
-              :disabled="appStateInstance.isDownloading">
-            <span class="button">Select Image</span>
+        <div class="apple-drop-zone" 
+             @drop.prevent="handleFileDrop" 
+             @dragover.prevent
+             @dragenter.prevent="dragActive = true"
+             @dragleave.prevent="dragActive = false"
+             :class="{ 'drop-active': dragActive }">
+          <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5V19M12 5L7 10M12 5L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="upload-title">Drop your image here</h3>
+          <p class="upload-subtitle">or</p>
+          <label class="apple-button">
+            <input type="file" 
+                   @change="handleFileSelection" 
+                   accept="image/*"
+                   :disabled="appStateInstance.isDownloading"
+                   class="hidden-input">
+            Select Image
           </label>
-          <p>or drag and drop an image here</p>
         </div>
       </div>
 
-      <div v-if="isImageLoaded" class="image-details">
-        <p><strong>Selected File:</strong> {{ imageModelInstance.currentFileName }}</p>
-        <p>Current Dimensions: <span>{{ imageModelInstance.currentResolution.width }}</span> x <span>{{
-          imageModelInstance.currentResolution.height }}</span></p>
-        <p>Current Size: <span>{{ (imageModelInstance.currentFileSize / 1048576).toFixed(2) }}</span> MB</p>
+      <div v-if="isImageLoaded" class="apple-card image-details">
+        <div class="detail-row">
+          <span class="detail-label">File Name</span>
+          <span class="detail-value">{{ imageModelInstance.currentFileName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Current Dimensions</span>
+          <span class="detail-value">{{ imageModelInstance.currentResolution.width }} × {{ imageModelInstance.currentResolution.height }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Current Size</span>
+          <span class="detail-value">{{ (imageModelInstance.currentFileSize / 1048576).toFixed(2) }} MB</span>
+        </div>
       </div>
 
-      <div v-if="appStateInstance.showResizeFields" class="resize-fields">
-        <label for="targetWidth">Width:</label>
-        <input type="number" v-model="targetResolution.width" class="input-width" placeholder="Enter target width"
-          @input="updateDimensions(Dimension.WIDTH)" min="1" required>
-        <p v-if="targetResolution.width < 1 || isNaN(targetResolution.width)" class="error">Width must be a number
-          greater than 0.</p>
+      <div v-if="appStateInstance.showResizeFields" class="apple-card resize-fields">
+        <div class="input-group">
+          <label class="apple-label" for="targetWidth">Width</label>
+          <input type="number" 
+                 id="targetWidth"
+                 v-model="targetResolution.width" 
+                 class="apple-input" 
+                 placeholder="Enter target width"
+                 @input="updateDimensions(Dimension.WIDTH)" 
+                 min="1" 
+                 required>
+          <p v-if="targetResolution.width < 1 || isNaN(targetResolution.width)" class="apple-error">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 14A6 6 0 108 2a6 6 0 000 12zM8 5v4M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Width must be a number greater than 0
+          </p>
+        </div>
 
-        <label for="targetHeight">Height:</label>
-        <input type="number" v-model="targetResolution.height" class="input-height" placeholder="Enter target height"
-          @input="updateDimensions(Dimension.HEIGHT)" min="1" required>
-        <p v-if="targetResolution.height < 1 || isNaN(targetResolution.height)" class="error">Height must be a number
-          greater than 0.</p>
+        <div class="input-group">
+          <label class="apple-label" for="targetHeight">Height</label>
+          <input type="number" 
+                 id="targetHeight"
+                 v-model="targetResolution.height" 
+                 class="apple-input" 
+                 placeholder="Enter target height"
+                 @input="updateDimensions(Dimension.HEIGHT)" 
+                 min="1" 
+                 required>
+          <p v-if="targetResolution.height < 1 || isNaN(targetResolution.height)" class="apple-error">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 14A6 6 0 108 2a6 6 0 000 12zM8 5v4M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Height must be a number greater than 0
+          </p>
+        </div>
 
-        <p v-if="targetResolution.width * targetResolution.height > 25600000" class="error">The product of width and
-          height must not exceed 25,600,000.</p>
+        <p v-if="targetResolution.width * targetResolution.height > 25600000" class="apple-error">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 14A6 6 0 108 2a6 6 0 000 12zM8 5v4M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          The product of width and height must not exceed 25,600,000
+        </p>
 
-        <label>
-          <input type="checkbox" v-model="appStateInstance.keepAspectRatio"> Keep Aspect Ratio
+        <label class="apple-checkbox">
+          <input type="checkbox" v-model="appStateInstance.keepAspectRatio">
+          <span>Keep Aspect Ratio</span>
         </label>
         <div class="submit-button">
           <button @click="resizeImageByResolution"

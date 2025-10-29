@@ -52,20 +52,24 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  background-color: #007bff;
-  padding: 10px 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: var(--spacing-md) var(--spacing-xl);
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--apple-gray-100);
 }
 
 .navbar-brand {
-  color: white;
+  color: var(--color-text-primary);
   text-decoration: none;
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-family-display);
+  letter-spacing: -0.01em;
 }
 
 .navbar-nav {
@@ -73,31 +77,37 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
+  gap: var(--spacing-lg);
 }
 
 .nav-item {
-  margin-left: 20px;
+  margin: 0;
 }
 
 .nav-link {
-  color: white;
+  color: var(--color-text-secondary);
   text-decoration: none;
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 0.9375rem;
+  font-family: var(--font-family-body);
+  transition: color 0.2s ease;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
 }
 
 .nav-link:hover {
-  text-decoration: underline;
+  color: var(--color-text-primary);
+  background-color: var(--apple-gray-50);
 }
 
 #app {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 80px 35px 200px;
-  background-color: white;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(180deg, var(--apple-gray-50) 0%, var(--apple-white) 100%);
   width: 300%;
   max-width: 1200px;
   box-sizing: border-box;

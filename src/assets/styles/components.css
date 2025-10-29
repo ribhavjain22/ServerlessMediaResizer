@@ -1,0 +1,134 @@
+/* Apple-style Component Styles */
+
+/* Buttons */
+.apple-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-family: var(--font-family-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.apple-button:hover {
+  background-color: var(--apple-blue-hover);
+  transform: translateY(-1px);
+}
+
+.apple-button:disabled {
+  background-color: var(--apple-gray-200);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Form Controls */
+.apple-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--apple-gray-200);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-body);
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  background-color: var(--apple-white);
+  transition: all 0.2s ease;
+}
+
+.apple-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+}
+
+.apple-input:disabled {
+  background-color: var(--apple-gray-50);
+  cursor: not-allowed;
+}
+
+/* Select */
+.apple-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23525252' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+/* Drag & Drop Zone */
+.apple-drop-zone {
+  width: 100%;
+  padding: var(--spacing-2xl);
+  border: 2px dashed var(--apple-gray-200);
+  border-radius: var(--radius-lg);
+  background-color: var(--apple-gray-50);
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.apple-drop-zone:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(0, 113, 227, 0.05);
+}
+
+/* Card */
+.apple-card {
+  background-color: var(--apple-white);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Labels */
+.apple-label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-family: var(--font-family-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* Error Messages */
+.apple-error {
+  color: var(--color-error);
+  font-size: 0.875rem;
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Checkbox */
+.apple-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.apple-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid var(--apple-gray-200);
+  border-radius: var(--radius-sm);
+  background-color: var(--apple-white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.apple-checkbox input[type="checkbox"]:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='9' viewBox='0 0 12 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L4.5 7.5L11 1' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
