@@ -20,6 +20,26 @@ export default defineConfig({
   },
 
   build: {
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      // Ensure gs.js and gs.wasm are copied to the build output
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        gs: fileURLToPath(new URL('./public/gs.js', import.meta.url))
+      }
+    }
+  },
+
+  // Configure WASM file handling
+  optimizeDeps: {
+    exclude: ['gs.wasm']
+  },
+
+  // Properly serve WASM files in development
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp'
+    }
   }
 })

@@ -12,6 +12,22 @@
     ],
     "routes": [
       {
+        "src": "/gs.wasm",
+        "headers": { 
+          "content-type": "application/wasm",
+          "cache-control": "public, max-age=31536000, immutable"
+        },
+        "dest": "/gs.wasm"
+      },
+      {
+        "src": "/gs.js",
+        "headers": { 
+          "content-type": "application/javascript",
+          "cache-control": "public, max-age=31536000, immutable"
+        },
+        "dest": "/gs.js"
+      },
+      {
         "src": "/assets/(.*)",
         "headers": { "cache-control": "public, max-age=31536000, immutable" },
         "dest": "/assets/$1"
