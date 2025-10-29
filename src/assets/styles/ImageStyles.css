@@ -219,7 +219,7 @@ select {
 }
 
 .downloading-message {
-  color: green;
+  color: var(--color-primary);
   font-size: 1rem;
   margin: var(--spacing-md) 0 0;
 }

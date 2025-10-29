@@ -13,20 +13,25 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  background-color: #007bff;
-  padding: 10px 20px;
+  background-color: var(--color-background);
+  padding: var(--spacing-md) var(--spacing-xl);
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--apple-gray-100);
 }
 
 .navbar-brand {
-  color: white;
+  color: var(--color-text-primary);
   text-decoration: none;
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-family-display);
+  letter-spacing: -0.01em;
 }
 
 .navbar-nav {
@@ -34,19 +39,25 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  gap: var(--spacing-lg);
 }
 
 .nav-item {
-  margin-left: 20px;
+  margin: 0;
 }
 
 .nav-link {
-  color: white;
+  color: var(--color-text-secondary);
   text-decoration: none;
+  font-family: var(--font-family-body);
+  transition: color 0.2s ease;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
 }
 
 .nav-link:hover {
-  text-decoration: underline;
+  color: var(--color-text-primary);
+  background-color: var(--apple-gray-50);
 }
 
 
@@ -74,7 +85,7 @@ h1 {
 }
 
 .upload-container:hover {
-  background-color: #f0f8ff;
+  background-color: var(--color-background-subtle);
 }
 
 .upload-label {
@@ -92,7 +103,7 @@ h1 {
   display: inline-block;
   padding: 10px 20px;
   color: white;
-  background-color: #007bff;
+  background-color: var(--color-primary);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -100,7 +111,7 @@ h1 {
 }
 
 .upload-label .button:hover {
-  background-color: #0056b3;
+  background-color: var(--apple-blue-hover);
 }
 
 .input-width {
@@ -121,7 +132,7 @@ h1 {
 .compress-button {
   padding: 10px 20px;
   color: white;
-  background-color: var(--color-primary, #007bff);
+  background-color: var(--color-primary);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -129,7 +140,7 @@ h1 {
 }
 
 .compress-button:hover {
-  background-color: #0056b3;
+  background-color: var(--apple-blue-hover);
 }
 
 .download-section {
@@ -145,7 +156,7 @@ h1 {
 
 
 .downloading-message {
-  color: green;
+  color: var(--color-primary);
   font-size: 14px;
   margin: var(--spacing-md) 0;
 }
@@ -159,11 +170,9 @@ h1 {
 }
 
 .download-messagee {
-  color: green;
+  color: var(--color-primary);
   font-size: 18px;
-  margin-top: 170px;
-  margin-left: 110px;
-  margin-bottom: -12px;
+  margin-top: var(--spacing-lg);
   max-width: 400px;
 
 }

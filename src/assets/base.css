@@ -1,22 +1,25 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
-  /* Apple-inspired color palette */
+  /* Enhanced color palette */
   --apple-white: #ffffff;
-  --apple-gray-50: #f9f9f9;
-  --apple-gray-100: #f2f2f2;
-  --apple-gray-200: #e5e5e5;
-  --apple-gray-300: #d4d4d4;
-  --apple-gray-400: #a3a3a3;
-  --apple-gray-500: #737373;
-  --apple-gray-600: #525252;
-  --apple-gray-700: #404040;
-  --apple-gray-800: #262626;
-  --apple-gray-900: #171717;
+  --apple-gray-50: #f8fafc;
+  --apple-gray-100: #f1f5f9;
+  --apple-gray-200: #e2e8f0;
+  --apple-gray-300: #cbd5e1;
+  --apple-gray-400: #94a3b8;
+  --apple-gray-500: #64748b;
+  --apple-gray-600: #475569;
+  --apple-gray-700: #334155;
+  --apple-gray-800: #1e293b;
+  --apple-gray-900: #0f172a;
   
-  /* Accent colors */
-  --apple-blue: #0071e3;
-  --apple-blue-hover: #0077ed;
+  /* Enhanced accent colors */
+  --apple-blue: #0070f3;
+  --apple-blue-hover: #0061df;
+  --apple-blue-light: #3291ff;
   --apple-red: #ff3b30;
+  --gradient-blue: linear-gradient(135deg, #0070f3 0%, #00c6fb 100%);
+  --gradient-bg: linear-gradient(135deg, #f6f9fc 0%, #f1f5f9 100%);
   
   /* Semantic colors */
   --color-primary: var(--apple-blue);
