@@ -1,17 +1,8 @@
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  font-family: Arial, sans-serif;
-  overflow: auto;
-}
+/* Global body styles belong in base.css — keep this file component-scoped */
 
 .file-info {
-  margin-top: -150px;
-  margin-bottom: 70px;
-  position: absolute;
-  margin-left: -240px;
+  margin: 0 0 var(--spacing-lg) 0;
+  position: relative;
   text-align: center;
   width: 100%;
   font-size: large;
@@ -69,14 +60,14 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #007bff;
+  border: 2px dashed var(--color-primary, #007bff);
   border-radius: 10px;
   padding: 40px;
-  width: 400%;
+  width: 100%;
   max-width: 900px;
-  height: 400px;
-  margin-bottom: 20px;
-  margin-left: 80px;
+  height: auto;
+  min-height: 220px;
+  margin: 0 auto 20px;
   cursor: pointer;
   text-align: center;
   transition: background-color 0.2s;
@@ -114,12 +105,11 @@ h1 {
 
 .input-width {
   width: 100%;
-  margin-bottom: -1px;
+  margin-bottom: var(--spacing-sm);
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1em;
-  margin-left: 350px;
 }
 
 .buttons {
@@ -131,13 +121,11 @@ h1 {
 .compress-button {
   padding: 10px 20px;
   color: white;
-  background-color: #007bff;
+  background-color: var(--color-primary, #007bff);
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-right: -680px;
-  margin-top: 50px;
-  margin-bottom: 10px;
+  margin: var(--spacing-md) 0;
 }
 
 .compress-button:hover {
@@ -148,8 +136,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 150px;
-  margin-right: 2100px;
+  margin-top: var(--spacing-lg);
 }
 
 .download-section .button {
@@ -160,14 +147,11 @@ h1 {
 .downloading-message {
   color: green;
   font-size: 14px;
-  margin-top: 170px;
-  margin-left: 110px;
-  margin-bottom: -12px;
+  margin: var(--spacing-md) 0;
 }
 
 
 .upload {
-  margin-left: -10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;

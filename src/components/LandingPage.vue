@@ -10,7 +10,7 @@
       </nav>
     </header>
 
-    <main id="app">
+  <main class="landing-main">
       <section class="columns">
         <div class="column image-conversion">
           <h2>Image Conversion</h2>
@@ -39,13 +39,7 @@ export default {
 </script>
 
 <style scoped>
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
+/* Avoid styling global <body> inside a scoped component */
 
 .navbar {
   display: flex;
@@ -102,31 +96,33 @@ body {
   background-color: var(--apple-gray-50);
 }
 
-#app {
+.landing-main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-2xl) var(--spacing-xl);
+  padding: calc(var(--spacing-2xl) + 72px) var(--spacing-xl) var(--spacing-2xl); /* account for fixed navbar height */
   background: linear-gradient(180deg, var(--apple-gray-50) 0%, var(--apple-white) 100%);
-  width: 300%;
+  width: 100%;
   max-width: 1200px;
   box-sizing: border-box;
 }
 
 .columns {
   display: flex;
-  justify-content: space-between;
-  width: 300%;
-  max-width: 1200px;
+  gap: var(--spacing-xl);
+  width: 100%;
+  align-items: stretch;
+  box-sizing: border-box;
 }
 
 .column {
-  width: 48%;
+  flex: 1 1 0;
   padding: 20px;
   box-sizing: border-box;
-  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
   border-radius: 10px;
+  min-width: 260px;
 }
 
 .image-conversion {

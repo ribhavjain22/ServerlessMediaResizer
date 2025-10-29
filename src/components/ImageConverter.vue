@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="page-root">
     <!-- Navbar -->
     <nav class="navbar">
       <a href="/" class="navbar-brand">ConvertEase</a>

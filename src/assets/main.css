@@ -25,11 +25,15 @@ a,
   body {
     display: flex;
     place-items: center;
+    justify-content: center;
   }
 
+  /* Keep a single centered app column and constrain width for readability */
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: block;
+    max-width: 1200px;
+    width: 100%;
     padding: 0 2rem;
+    margin: 0 auto;
   }
 }

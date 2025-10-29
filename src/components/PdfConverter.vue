@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="page-root">
     <nav class="navbar">
       <router-link to="/" class="navbar-brand">PDF Compressor</router-link>
       <ul class="navbar-nav">
