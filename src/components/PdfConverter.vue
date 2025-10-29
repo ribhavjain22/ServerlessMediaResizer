@@ -1,19 +1,32 @@
 <template>
   <div class="page-root">
-    <nav class="navbar">
-      <router-link to="/" class="navbar-brand">PDF Compressor</router-link>
-      <ul class="navbar-nav">
-        <li class="nav-item"><router-link to="/" class="nav-link">Home</router-link></li>
-        <li class="nav-item"><router-link to="/about" class="nav-link">About</router-link></li>
-      </ul>
-    </nav>
+    <header class="navbar">
+      <router-link to="/" class="navbar-brand">ConvertEase</router-link>
+      <nav class="navbar-nav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><router-link to="/" class="nav-link">Home</router-link></li>
+          <li class="nav-item"><router-link to="/features" class="nav-link">Features</router-link></li>
+        </ul>
+      </nav>
+    </header>
     <form @submit="onSubmit" class="form-container">
       <div v-if="!file" class="upload-container" @dragover.prevent @drop.prevent="onDrop">
-        <label class="upload-label">
-          <span>Drag and drop your PDF here</span>
-          <span class="button upload">Upload PDF</span>
-          <input type="file" @change="onFileChange" accept="application/pdf" />
-        </label>
+        <div class="apple-drop-zone" 
+             @dragenter.prevent="dragActive = true"
+             @dragleave.prevent="dragActive = false"
+             :class="{ 'drop-active': dragActive }">
+          <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5V19M12 5L7 10M12 5L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="upload-title">Drop your PDF here</h3>
+          <p class="upload-subtitle">or</p>
+          <label class="apple-button">
+            <input type="file" @change="onFileChange" accept="application/pdf" class="hidden-input">
+            Select PDF
+          </label>
+        </div>
       </div>
       <div v-if="file" class="resize-fields">
         <div class="file-info">
@@ -103,10 +116,15 @@ export default {
 
       state.value = COMPRESSION_STATE.COMPRESSION_IN_PROGRESS;
       try {
+        // Handle the PDF compression with error handling for encrypted PDFs
         await compressPDFWithGhostscript(
           file.value.url,
           file.value.filename,
-          { mode: 'preset', level: compressionLevel.value },
+          { 
+            mode: 'preset', 
+            level: compressionLevel.value,
+            ignoreEncryption: true
+          },
           handleCompressionCompletion,
           showProgress,
           showStatusUpdate
@@ -114,6 +132,8 @@ export default {
       } catch (error) {
         logger.logError(error);
         state.value = COMPRESSION_STATE.FILE_SELECTED;
+        // Show user-friendly error message
+        alert('There was an error compressing the PDF. If the PDF is encrypted, please remove the password protection and try again.');
       }
     }
 

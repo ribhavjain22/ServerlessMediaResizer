@@ -1,11 +1,32 @@
 /* Global body styles belong in base.css — keep this file component-scoped */
 
 .file-info {
-  margin: 0 0 var(--spacing-lg) 0;
-  position: relative;
-  text-align: center;
-  width: 100%;
-  font-size: large;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: var(--spacing-xl);
+  transition: all 0.3s ease;
+  animation: containerFadeIn 0.6s ease-out;
+}
+
+.file-info:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.file-info p {
+  color: var(--color-text-secondary);
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
 }
 
 .navbar {
@@ -66,52 +87,198 @@ h1 {
   margin-bottom: 20px;
 }
 
-.upload-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed var(--color-primary, #007bff);
-  border-radius: 10px;
-  padding: 40px;
+.page-root {
+  min-height: 100vh;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(0, 113, 227, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(0, 113, 227, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, var(--apple-white) 0%, var(--apple-gray-50) 100%);
+}
+
+.form-container {
+  padding: calc(var(--spacing-2xl) + 72px) var(--spacing-xl) var(--spacing-2xl);
+  max-width: 800px;
+  margin: 0 auto;
   width: 100%;
-  max-width: 900px;
-  height: auto;
-  min-height: 220px;
-  margin: 0 auto 20px;
-  cursor: pointer;
+  animation: mainFadeIn 0.8s ease-out;
+}
+
+.upload-container {
+  margin: var(--spacing-xl) 0;
+  animation: containerFadeIn 0.6s ease-out;
+}
+
+.apple-drop-zone {
+  border: 2px dashed var(--apple-gray-200);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
   text-align: center;
-  transition: background-color 0.2s;
-}
-
-.upload-container:hover {
-  background-color: var(--color-background-subtle);
-}
-
-.upload-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
 }
 
-.upload-label input[type="file"] {
+.apple-drop-zone:hover {
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.drop-active {
+  border-color: var(--color-primary);
+  background-color: rgba(0, 113, 227, 0.05);
+  transform: scale(1.02);
+}
+
+.upload-icon {
+  color: var(--apple-gray-400);
+  margin-bottom: var(--spacing-md);
+  transition: transform 0.3s ease;
+}
+
+.apple-drop-zone:hover .upload-icon {
+  transform: translateY(-5px);
+}
+
+.upload-title {
+  font-family: var(--font-family-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.upload-subtitle {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.hidden-input {
   display: none;
 }
 
-.upload-label .button {
+.apple-button {
   display: inline-block;
-  padding: 10px 20px;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--apple-blue-hover) 100%);
   color: white;
-  background-color: var(--color-primary);
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  margin-top: 10px;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
 }
 
-.upload-label .button:hover {
-  background-color: var(--apple-blue-hover);
+.apple-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4);
+}
+
+.apple-button:active {
+  transform: translateY(0);
+}
+
+.compression-options {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: var(--spacing-xl);
+  transition: all 0.3s ease;
+  animation: containerFadeIn 0.8s ease-out;
+}
+
+.compression-options:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced Form Elements */
+select.input-width {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--apple-gray-200);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+}
+
+select.input-width:hover {
+  border-color: var(--color-primary);
+  background-color: white;
+}
+
+select.input-width:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.downloading-message {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+  margin-top: var(--spacing-xl);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.download-section {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.download-message {
+  display: inline-block;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, var(--apple-blue-light) 0%, var(--color-primary) 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.download-message:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .input-width {
@@ -130,17 +297,42 @@ h1 {
 }
 
 .compress-button {
-  padding: 10px 20px;
+  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #0070f3 0%, #00a3ff 100%);
   color: white;
-  background-color: var(--color-primary);
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  margin: var(--spacing-md) 0;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 16px rgba(0, 113, 227, 0.4),
+    0 2px 4px rgba(0, 113, 227, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.01em;
+  text-transform: none;
+  min-width: 200px;
+  margin: var(--spacing-lg) 0;
 }
 
 .compress-button:hover {
-  background-color: var(--apple-blue-hover);
+  background: linear-gradient(135deg, #0080ff 0%, #00b3ff 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 24px rgba(0, 113, 227, 0.5),
+    0 4px 8px rgba(0, 113, 227, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.compress-button:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 6px 12px rgba(0, 113, 227, 0.3),
+    0 2px 4px rgba(0, 113, 227, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .download-section {

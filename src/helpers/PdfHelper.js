@@ -11,7 +11,10 @@ async function compressPDF(pdfUrl, filename, options, onLoadComplete, onProgress
     const response = await fetch(pdfUrl);
     const pdfBuffer = await response.arrayBuffer();
     
-    const pdfDoc = await PDFDocument.load(pdfBuffer);
+    const pdfDoc = await PDFDocument.load(pdfBuffer, { 
+      ignoreEncryption: true,
+      updateMetadata: false
+    });
     const pages = pdfDoc.getPages();
     const totalPages = pages.length;
     
@@ -299,13 +302,24 @@ export async function compressPDFWithGhostscript(pdfUrl, filename, options, onLo
     const pdfBuffer = await response.arrayBuffer();
 
     // 2. Load with pdf-lib (if you want to do any pdf-lib-based manipulations first)
-    const pdfDoc = await PDFDocument.load(pdfBuffer);
-    // ... Perform any pdf-lib manipulation, optimization, etc. ...
+    const pdfDoc = await PDFDocument.load(pdfBuffer, {
+      ignoreEncryption: true,
+      updateMetadata: false
+    });
+    
+    // Remove any encryption/security settings
+    pdfDoc.setTitle('');
+    pdfDoc.setAuthor('');
+    pdfDoc.setSubject('');
+    pdfDoc.setKeywords([]);
+    pdfDoc.setCreator('');
+    pdfDoc.setProducer('');
 
-    // 3. Save resulting PDF
+    // 3. Save resulting PDF with encryption disabled
     const partialPdf = await pdfDoc.save({
       useObjectStreams: true,
-      compress: true
+      compress: true,
+      preserveEncryption: false
     });
 
     // 4. Create a Blob / Object URL so Ghostscript can read it
