@@ -43,12 +43,17 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url))
       },
+      external: ['/gs.js'],
       output: {
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'gs.wasm') {
-            return 'assets/[name][extname]';
+          const info = assetInfo.name.split('.');
+          const ext = info.pop();
+          const name = info.join('.');
+          
+          if (name === 'gs' && (ext === 'wasm' || ext === 'js')) {
+            return `assets/${name}.${ext}`;
           }
-          return 'assets/[name]-[hash][extname]';
+          return `assets/[name]-[hash].${ext}`;
         }
       }
     }

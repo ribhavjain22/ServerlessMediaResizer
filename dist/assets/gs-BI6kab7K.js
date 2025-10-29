@@ -1,2 +1,0 @@
-(function(){try{var e=typeof window<"u"?window:typeof global<"u"?global:typeof self<"u"?self:{},s=new Error().stack;s&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[s]="814b99a6-4f77-4d25-b094-02826b72378e",e._sentryDebugIdIdentifier="sentry-dbid-814b99a6-4f77-4d25-b094-02826b72378e")}catch{}})();const n="/assets/gs-D1HWvR6b.wasm";export{n as default};
-//# sourceMappingURL=gs-BI6kab7K.js.map
