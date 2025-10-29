@@ -8,10 +8,26 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue(), vueJsx(), vueDevTools(), sentryVitePlugin({
-    org: "nerdnextdoor",
-    project: "pixelperfect"
-  })],
+  plugins: [
+    vue(), 
+    vueJsx(), 
+    vueDevTools(),
+    {
+      name: 'wasm',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url.endsWith('.wasm')) {
+            res.setHeader('Content-Type', 'application/wasm');
+          }
+          next();
+        });
+      }
+    },
+    sentryVitePlugin({
+      org: "nerdnextdoor",
+      project: "pixelperfect"
+    })
+  ],
 
   resolve: {
     alias: {
@@ -22,11 +38,18 @@ export default defineConfig({
   build: {
     sourcemap: true,
     target: 'esnext',
+    assetsInclude: ['**/*.wasm'],
     rollupOptions: {
-      // Ensure gs.js and gs.wasm are copied to the build output
       input: {
-        main: fileURLToPath(new URL('./index.html', import.meta.url)),
-        gs: fileURLToPath(new URL('./public/gs.js', import.meta.url))
+        main: fileURLToPath(new URL('./index.html', import.meta.url))
+      },
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'gs.wasm') {
+            return 'assets/[name][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        }
       }
     }
   },

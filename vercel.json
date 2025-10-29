@@ -12,20 +12,22 @@
     ],
     "routes": [
       {
-        "src": "/gs.wasm",
+        "src": "/assets/gs.wasm",
         "headers": { 
           "content-type": "application/wasm",
-          "cache-control": "public, max-age=31536000, immutable"
+          "cache-control": "public, max-age=31536000, immutable",
+          "cross-origin-embedder-policy": "require-corp",
+          "cross-origin-opener-policy": "same-origin"
         },
-        "dest": "/gs.wasm"
+        "dest": "/assets/gs.wasm"
       },
       {
-        "src": "/gs.js",
+        "src": "/assets/gs.js",
         "headers": { 
           "content-type": "application/javascript",
           "cache-control": "public, max-age=31536000, immutable"
         },
-        "dest": "/gs.js"
+        "dest": "/assets/gs.js"
       },
       {
         "src": "/assets/(.*)",

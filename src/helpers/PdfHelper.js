@@ -2,7 +2,8 @@
 
 import { PDFDocument, PDFName, PDFStream, PDFDict } from 'pdf-lib';
 import Logger from './Error/Logger';
-import { _GSPS2PDF } from '../ghostscript-utils'; // Import your Ghostscript wrapper
+import { _GSPS2PDF } from '../ghostscript-utils';
+import { loadGhostscript } from '../ghostscript-loader';
 
 const logger = new Logger('pdfconverter.vue');
 
