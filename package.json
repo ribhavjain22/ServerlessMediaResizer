@@ -33,5 +33,18 @@
     "vite": "^5.3.1",
     "vite-plugin-vue-devtools": "^7.3.1",
     "vitest": "^1.6.0"
+  },
+  "browserslist": {
+    "production": [
+      "chrome >= 100",
+      "firefox >= 91",
+      "safari >= 15",
+      "edge >= 100"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

@@ -21,6 +21,7 @@ export default defineConfig({
 
   build: {
     sourcemap: true,
+    target: 'esnext',
     rollupOptions: {
       // Ensure gs.js and gs.wasm are copied to the build output
       input: {
