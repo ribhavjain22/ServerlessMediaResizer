@@ -1,20 +1,31 @@
 @import './components.css';
 
 .content {
-  padding-top: calc(var(--spacing-2xl) + var(--spacing-lg));
+  padding: calc(var(--spacing-2xl) + 72px) var(--spacing-xl) var(--spacing-2xl);
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
+  animation: mainFadeIn 0.8s ease-out;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(0, 113, 227, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(0, 113, 227, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, var(--apple-white) 0%, var(--apple-gray-50) 100%);
 }
 
 /* Upload Zone Styles */
 .upload-container {
   margin: var(--spacing-xl) 0;
+  animation: containerFadeIn 0.6s ease-out;
 }
 
 .upload-icon {
   color: var(--apple-gray-400);
   margin-bottom: var(--spacing-md);
+  transition: transform 0.3s ease;
+}
+
+.apple-drop-zone:hover .upload-icon {
+  transform: translateY(-5px);
 }
 
 .upload-title {
@@ -37,6 +48,60 @@
 .drop-active {
   border-color: var(--color-primary);
   background-color: rgba(0, 113, 227, 0.05);
+  transform: scale(1.02);
+}
+
+/* Navbar Styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  padding: var(--spacing-md) var(--spacing-xl);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  animation: navbarFadeIn 0.5s ease-out;
+}
+
+.navbar-brand {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-family-display);
+  letter-spacing: -0.01em;
+}
+
+.navbar-nav {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: var(--spacing-lg);
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-family: var(--font-family-body);
+  transition: all 0.2s ease;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.nav-link:hover {
+  color: var(--color-text-primary);
+  background-color: var(--apple-gray-50);
 }
 
 /* Image Details Styles */
@@ -187,14 +252,104 @@
 }
 
 button {
-  padding: 0.75rem 1.5rem;
-  color: white;
-  background-color: var(--color-primary);
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
+  padding: 0.875rem 1.75rem;
   font-size: 1rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--apple-blue-hover) 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
   margin-bottom: var(--spacing-md);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Enhanced Animations */
+@keyframes navbarFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mainFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes containerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apple-drop-zone {
+  border: 2px dashed var(--apple-gray-200);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.apple-drop-zone:hover {
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.apple-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: var(--spacing-xl);
+  transition: all 0.3s ease;
+  animation: containerFadeIn 0.6s ease-out;
+}
+
+.apple-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
 button.blurred {

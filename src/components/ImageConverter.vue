@@ -1,13 +1,14 @@
 <template>
   <div class="page-root">
-    <!-- Navbar -->
-    <nav class="navbar">
-      <a href="/" class="navbar-brand">ConvertEase</a>
-      <ul class="navbar-nav">
-        <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
-        <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-      </ul>
-    </nav>
+    <header class="navbar">
+      <router-link to="/" class="navbar-brand">ConvertEase</router-link>
+      <nav class="navbar-nav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><router-link to="/" class="nav-link">Home</router-link></li>
+          <li class="nav-item"><router-link to="/features" class="nav-link">Features</router-link></li>
+        </ul>
+      </nav>
+    </header>
 
     <div class="content">
       <div v-if="!isImageLoaded" class="upload-container">
