@@ -1,4 +1,8 @@
 flask
 flask-cors
 werkzeug
+flask
+flask-cors
+werkzeug
 pymupdf
+Pillow
