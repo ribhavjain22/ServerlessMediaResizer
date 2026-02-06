@@ -34,12 +34,17 @@
           <p>File Size: {{ file.size }} KB</p>
         </div>
         <div class="compression-options">
-          <div class="preset-options">
-            <select v-model="compressionLevel" class="input-width">
-              <option value="LOW">Low Compression</option>
-              <option value="MEDIUM">Medium Compression</option>
-              <option value="HIGH">High Compression</option>
-            </select>
+          <div class="target-size-container">
+             <label for="target-size">Target File Size (MB):</label>
+             <input 
+               id="target-size" 
+               type="number" 
+               step="0.1" 
+               min="0.1" 
+               v-model="targetSizeMB" 
+               class="size-input"
+             />
+             <p class="size-hint">The original file is {{ (file.size / 1024).toFixed(2) }} MB. Suggested: {{ ((file.size / 1024) * 0.5).toFixed(2) }} MB</p>
           </div>
         </div>
         <div class="buttons">
@@ -58,10 +63,7 @@
 
 <script>
 import { ref, computed } from 'vue';
-import { compressPDF, compressPDFWithGhostscript } from '../helpers/PdfHelper';
-import { PdfData } from '../models/pdf/PdfModel';
 import { COMPRESSION_STATE } from '../models/ENUM/COMPRESSION_STATE';
-import { COMPRESSION_LEVEL } from '../models/ENUM/COMPRESSION_LEVEL';
 import Logger from '../helpers/Error/Logger';
 
 const logger = new Logger('pdfconverter.vue');
@@ -71,7 +73,9 @@ export default {
     const file = ref(null);
     const state = ref(COMPRESSION_STATE.NO_FILE_SELECTED);
     const downloadLink = ref('');
-    const compressionLevel = ref(COMPRESSION_LEVEL.LOW);
+    const targetSizeMB = ref(1.0); // Default 1MB
+    const useTargetSize = ref(true);
+    const dragActive = ref(false);
 
     const safeDownloadLink = computed(() => {
       return isValidUrl(downloadLink.value) ? downloadLink.value : '';
@@ -90,6 +94,7 @@ export default {
       state.value = COMPRESSION_STATE.NO_FILE_SELECTED;
       if (errorMessage) {
         console.error(errorMessage);
+        alert(errorMessage);
       }
     }
 
@@ -99,8 +104,13 @@ export default {
         if (uploadedFile && uploadedFile.type === 'application/pdf') {
           const url = window.URL.createObjectURL(uploadedFile);
           const size = (uploadedFile.size / 1024).toFixed(2);
-          file.value = { filename: uploadedFile.name, url, size };
+          file.value = { filename: uploadedFile.name, url, size, rawFile: uploadedFile };
           state.value = COMPRESSION_STATE.FILE_SELECTED;
+          
+          // Set a reasonable default target size (e.g., 50% of original)
+          targetSizeMB.value = parseFloat(((uploadedFile.size / 1024 / 1024) * 0.5).toFixed(2));
+          if (targetSizeMB.value < 0.1) targetSizeMB.value = 0.1;
+          
         } else {
           resetFileState('Invalid file type. Please upload a PDF file.');
         }
@@ -115,50 +125,47 @@ export default {
       if (!file.value) return;
 
       state.value = COMPRESSION_STATE.COMPRESSION_IN_PROGRESS;
+      
+      const formData = new FormData();
+      formData.append('file', file.value.rawFile);
+      // Backend expects KB, but let's stick to what we decided in app.py or adjust. 
+      // app.py expects targetSize (KB).
+      const targetSizeKB = Math.round(targetSizeMB.value * 1024);
+      formData.append('targetSize', targetSizeKB);
+
+      // Get API URL from env or default to local Flask port
+      const API_URL = import.meta.env.VITE_PDF_SERVICE_URL || 'http://localhost:5000';
+
       try {
-        // Handle the PDF compression with error handling for encrypted PDFs
-        await compressPDFWithGhostscript(
-          file.value.url,
-          file.value.filename,
-          { 
-            mode: 'preset', 
-            level: compressionLevel.value,
-            ignoreEncryption: true
-          },
-          handleCompressionCompletion,
-          showProgress,
-          showStatusUpdate
-        );
-      } catch (error) {
-        logger.logError(error);
-        state.value = COMPRESSION_STATE.FILE_SELECTED;
-        // Show user-friendly error message
-        alert('There was an error compressing the PDF. If the PDF is encrypted, please remove the password protection and try again.');
-      }
-    }
+        const response = await fetch(`${API_URL}/resize-pdf`, {
+          method: 'POST',
+          body: formData,
+        });
 
-    function showProgress(...args) {
-      console.log('Compression Progress:', args);
-    }
+        if (!response.ok) {
+           const errorText = await response.text();
+           throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
 
-    function showStatusUpdate(element) {
-      console.log('Status Update:', element);
-    }
-
-    async function handleCompressionCompletion(element) {
-      try {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
         state.value = COMPRESSION_STATE.READY_FOR_DOWNLOAD;
-        downloadLink.value = element.pdfDataURL;
+        downloadLink.value = url;
+        
       } catch (error) {
         logger.logError(error);
         state.value = COMPRESSION_STATE.FILE_SELECTED;
+        alert(`Compression failed: ${error.message}`);
       }
     }
 
     return {
       file,
       state,
-      compressionLevel,
+      targetSizeMB,
+      useTargetSize,
+      dragActive,
       safeDownloadLink,
       onFileChange,
       onSubmit,
@@ -168,3 +175,26 @@ export default {
 </script>
 
 <style scoped src="../assets/styles/DocumentStyles.css"></style>
+<style scoped>
+.target-size-container {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.size-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 150px;
+  text-align: center;
+}
+
+.size-hint {
+  font-size: 0.8rem;
+  color: #666;
+}
+</style>
