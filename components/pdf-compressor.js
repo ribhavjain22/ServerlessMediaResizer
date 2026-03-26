@@ -45,11 +45,16 @@ export function PdfCompressor() {
       setStatus("Compressing PDF...");
       setLastResult(null);
 
+      const apiBaseUrl = resolvePdfApiBaseUrl();
+      if (!apiBaseUrl) {
+        throw new Error("PDF backend is not configured. Set NEXT_PUBLIC_PDF_API_URL.");
+      }
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("targetBytes", String(targetBytes));
 
-      const response = await fetch("/api/pdf/compress", {
+      const response = await fetch(`${apiBaseUrl}/compress`, {
         method: "POST",
         body: formData
       });
@@ -205,4 +210,9 @@ function formatBytes(bytes) {
 
 function sanitizeLabel(label) {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
+function resolvePdfApiBaseUrl() {
+  const rawValue = process.env.NEXT_PUBLIC_PDF_API_URL;
+  return rawValue ? rawValue.replace(/\/+$/, "") : "";
 }

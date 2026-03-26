@@ -1,9 +1,9 @@
 # Serverless Media Resizer
 
-Next.js + React rebuild of the media resizer with:
+Next.js + React frontend plus a Python PDF backend with:
 
 - a fully client-side image converter
-- a new PDF compression service exposed through a Next.js route handler
+- a Render-hosted PDF compression service
 - a glossy Apple-inspired UI
 
 ## Local development
@@ -15,14 +15,25 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+Start the PDF backend separately:
+
+```bash
+cd server
+python -m pip install -r requirements.txt
+python app.py
+```
+
+Then set:
+
+```bash
+NEXT_PUBLIC_PDF_API_URL=http://localhost:10000
+```
+
 ## Product shape
 
 - **Image converter** stays browser-native for privacy and speed.
-- **PDF compressor** runs through `/api/pdf/compress`.
-- Compression modes are explicit:
-  - `preserve`
-  - `balanced`
-  - `maximum`
+- **PDF compressor** calls an external backend configured through `NEXT_PUBLIC_PDF_API_URL`.
+- The PDF flow targets the closest result under the selected size cap.
 
 ## Deployment
 
@@ -34,19 +45,20 @@ This app is ready for a standard Next.js deployment on Vercel.
 - Install command: `npm install`
 - Build command: `npm run build`
 - Output: managed by Vercel automatically
+- Environment variable: `NEXT_PUBLIC_PDF_API_URL=https://your-render-service.onrender.com`
 
 A minimal [`vercel.json`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/vercel.json) is included, but Vercel can deploy this repo with its defaults.
 
-### Render
+### Render Backend
 
-This app can also run as a Node web service on Render.
+The PDF compressor should run as a Python web service on Render.
 
-- Runtime: `Node`
-- Build command: `npm install && npm run build`
-- Start command: `npm run start`
-- Node version: `20`
+- Runtime: `Python`
+- Root directory: `server`
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn app:app`
 
-A ready-to-use [`render.yaml`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/render.yaml) is included for blueprint-based setup.
+A ready-to-use [`render.yaml`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/server/render.yaml) is included for blueprint-based setup.
 
 ## MCP note
 
@@ -54,5 +66,6 @@ You shared MCP configs for Vercel and Render, but those MCP servers are not regi
 
 ## Notes
 
-- The PDF service is rebuilt from scratch around a clean request/response contract.
-- This version intentionally removes the old Vue, Flask, Ghostscript, and duplicate scaffold code.
+- Vercel hosts the frontend.
+- Render hosts the Python PDF compression service.
+- This split is intentional because the stronger PDF path depends on Python libraries that are a poor fit for a plain Vercel function deployment.
