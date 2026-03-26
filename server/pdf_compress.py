@@ -116,13 +116,9 @@ def choose_best(input_path, target_bytes, output_path=None):
                 }
 
                 if attempt_size < best_effort_size:
-                    if best_effort_path not in {normalized_path, attempt_path} and os.path.exists(best_effort_path):
-                        os.remove(best_effort_path)
                     best_effort_path = attempt_path
                     best_effort_size = attempt_size
                     best_effort_meta = meta
-                elif os.path.exists(attempt_path):
-                    os.remove(attempt_path)
 
                 if attempt_size <= target_bytes:
                     if not best_under_target or attempt_size > best_under_target[0]:
