@@ -3,29 +3,24 @@
 import { useMemo, useState } from "react";
 import { Dropzone } from "@/components/dropzone";
 
-const modeCopy = {
-  preserve: {
-    title: "Preserve layout",
-    description: "Metadata cleanup and structural normalization with minimal visual risk."
-  },
-  balanced: {
-    title: "Balanced",
-    description: "Fresh compression pass for general sharing and storage."
-  },
-  maximum: {
-    title: "Maximum squeeze",
-    description: "Most aggressive save profile available in this rebuild."
-  }
-};
+const targetOptions = [
+  { label: "Under 500 KB", value: 512000, description: "Tight shareable file size." },
+  { label: "Under 1 MB", value: 1048576, description: "Best general-purpose preset." },
+  { label: "Under 2 MB", value: 2097152, description: "Higher quality, still reduced." },
+  { label: "Under 5 MB", value: 5242880, description: "Light compression, larger allowance." }
+];
 
 export function PdfCompressor() {
   const [file, setFile] = useState(null);
-  const [mode, setMode] = useState("balanced");
+  const [targetBytes, setTargetBytes] = useState(targetOptions[1].value);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [lastResult, setLastResult] = useState(null);
 
-  const selectedMode = useMemo(() => modeCopy[mode], [mode]);
+  const selectedTarget = useMemo(
+    () => targetOptions.find((option) => option.value === targetBytes) ?? targetOptions[1],
+    [targetBytes]
+  );
 
   function handleFileSelect(nextFile) {
     if (nextFile.type !== "application/pdf") {
@@ -52,7 +47,7 @@ export function PdfCompressor() {
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("mode", mode);
+      formData.append("targetBytes", String(targetBytes));
 
       const response = await fetch("/api/pdf/compress", {
         method: "POST",
@@ -67,14 +62,16 @@ export function PdfCompressor() {
       const blob = await response.blob();
       const downloadUrl = URL.createObjectURL(blob);
       const outputSize = response.headers.get("X-Output-Size") || formatBytes(blob.size);
-      const originalSize = response.headers.get("X-Original-Size") || formatBytes(file.size);
+      const originalSize = formatBytes(file.size);
+      const targetSize = formatBytes(targetBytes);
+      const strategy = response.headers.get("X-Compression-Strategy") || "best-match";
       const notes = (response.headers.get("X-Compression-Notes") || "")
         .split(" | ")
         .filter(Boolean);
 
       const anchor = document.createElement("a");
       anchor.href = downloadUrl;
-      anchor.download = `${file.name.replace(/\.pdf$/i, "")}-${mode}.pdf`;
+      anchor.download = `${file.name.replace(/\.pdf$/i, "")}-${sanitizeLabel(selectedTarget.label)}.pdf`;
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
@@ -82,6 +79,8 @@ export function PdfCompressor() {
       setLastResult({
         originalSize,
         outputSize,
+        targetSize,
+        strategy,
         notes
       });
       setStatus("Compressed PDF downloaded.");
@@ -93,7 +92,7 @@ export function PdfCompressor() {
 
   function reset() {
     setFile(null);
-    setMode("balanced");
+    setTargetBytes(targetOptions[1].value);
     setStatus("");
     setError("");
     setLastResult(null);
@@ -103,14 +102,14 @@ export function PdfCompressor() {
     <section className="glass-panel tool-card">
       <div className="section-heading">
         <p className="eyebrow">PDF Lab</p>
-        <h2>Fresh PDF compression service with explicit modes</h2>
+        <h2>Compress to a target size, not more than necessary</h2>
       </div>
 
       {!file ? (
         <Dropzone
           accept="application/pdf"
           title="Drop a PDF into the lab"
-          subtitle="The rebuild sends PDFs through a single Next.js service route."
+          subtitle="Pick the maximum size you can tolerate and the service will stop at the highest quality under that limit."
           buttonLabel="Select PDF"
           onFileSelect={handleFileSelect}
         />
@@ -126,28 +125,28 @@ export function PdfCompressor() {
               <strong>{formatBytes(file.size)}</strong>
             </div>
             <div className="info-tile">
-              <span className="info-label">Mode</span>
-              <strong>{selectedMode.title}</strong>
+              <span className="info-label">Target</span>
+              <strong>{selectedTarget.label}</strong>
             </div>
           </div>
 
           <div className="mode-grid">
-            {Object.entries(modeCopy).map(([key, value]) => (
+            {targetOptions.map((option) => (
               <button
-                key={key}
+                key={option.value}
                 type="button"
-                className={key === mode ? "mode-card is-active" : "mode-card"}
-                onClick={() => setMode(key)}
+                className={option.value === targetBytes ? "mode-card is-active" : "mode-card"}
+                onClick={() => setTargetBytes(option.value)}
               >
-                <strong>{value.title}</strong>
-                <span>{value.description}</span>
+                <strong>{option.label}</strong>
+                <span>{option.description}</span>
               </button>
             ))}
           </div>
 
           <div className="callout">
-            <strong>{selectedMode.title}</strong>
-            <p>{selectedMode.description}</p>
+            <strong>{selectedTarget.label}</strong>
+            <p>{selectedTarget.description}</p>
           </div>
 
           <div className="button-row">
@@ -160,16 +159,24 @@ export function PdfCompressor() {
           </div>
 
           {lastResult ? (
-            <div className="result-card">
+            <div className="result-card pdf-result-card">
               <div>
                 <span className="info-label">Original</span>
                 <strong>{lastResult.originalSize}</strong>
+              </div>
+              <div>
+                <span className="info-label">Target</span>
+                <strong>{lastResult.targetSize}</strong>
               </div>
               <div>
                 <span className="info-label">Output</span>
                 <strong>{lastResult.outputSize}</strong>
               </div>
               <div>
+                <span className="info-label">Strategy</span>
+                <strong>{lastResult.strategy}</strong>
+              </div>
+              <div className="result-span">
                 <span className="info-label">Service notes</span>
                 <strong>{lastResult.notes.join(", ") || "Compression completed."}</strong>
               </div>
@@ -194,4 +201,8 @@ function formatBytes(bytes) {
   }
 
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function sanitizeLabel(label) {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }

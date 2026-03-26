@@ -473,6 +473,14 @@ input {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.pdf-result-card {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.result-span {
+  grid-column: 1 / -1;
+}
+
 .status-message,
 .error-message {
   margin: 18px 0 0;
@@ -488,7 +496,8 @@ input {
   .workspace-grid,
   .info-grid,
   .mode-grid,
-  .result-card {
+  .result-card,
+  .pdf-result-card {
     grid-template-columns: 1fr;
   }
 
