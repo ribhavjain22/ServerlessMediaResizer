@@ -1,50 +1,20 @@
 {
-  "name": "vue-project",
-  "version": "0.0.0",
+  "name": "serverless-media-resizer",
+  "version": "1.0.0",
   "private": true,
-  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && node scripts/copy-gs-files.js",
-    "preview": "vite preview",
-    "test:unit": "vitest",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@sentry/vite-plugin": "^2.20.1",
-    "@sentry/vue": "^8.15.0",
-    "logrocket": "^8.1.0",
+    "next": "^15.3.0",
     "pdf-lib": "^1.17.1",
-    "pinia": "^2.1.7",
-    "vue": "^3.4.29",
-    "vue-router": "^4.4.0"
-  },
-  "devDependencies": {
-    "@rushstack/eslint-patch": "^1.8.0",
-    "@vitejs/plugin-vue": "^5.0.5",
-    "@vitejs/plugin-vue-jsx": "^4.0.0",
-    "@vue/eslint-config-prettier": "^9.0.0",
-    "@vue/test-utils": "^2.4.6",
-    "eslint": "^8.57.0",
-    "eslint-plugin-vue": "^9.23.0",
-    "jsdom": "^24.1.0",
-    "prettier": "^3.2.5",
-    "vite": "^5.3.1",
-    "vite-plugin-vue-devtools": "^7.3.1",
-    "vitest": "^1.6.0"
-  },
-  "browserslist": {
-    "production": [
-      "chrome >= 100",
-      "firefox >= 91",
-      "safari >= 15",
-      "edge >= 100"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }
