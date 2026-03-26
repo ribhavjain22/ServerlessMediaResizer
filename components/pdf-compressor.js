@@ -131,6 +131,7 @@ export function PdfCompressor() {
           title="Drop a PDF into the lab"
           subtitle="Pick the maximum size you can tolerate and the service will stop at the highest quality under that limit."
           buttonLabel="Select PDF"
+          hint="Uploads once, then keeps processing as a background job."
           onFileSelect={handleFileSelect}
         />
       ) : (
@@ -223,7 +224,7 @@ async function pollJob(apiBaseUrl, jobId, setStatus) {
       return job;
     }
 
-    setStatus("Compressing PDF in the background...");
+      setStatus("Compressing PDF in the background. You can keep this tab open while the job runs.");
   }
 
   throw new Error("Compression is taking too long. Please try again.");

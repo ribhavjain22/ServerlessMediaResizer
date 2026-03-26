@@ -5,6 +5,8 @@ A split media utility app with:
 - a Next.js + React frontend
 - a fully client-side image converter
 - a Python PDF compression backend
+- a mobile-first responsive shell
+- installable PWA support
 - a glossy Apple-inspired UI
 
 ## Live deployment
@@ -19,8 +21,19 @@ A split media utility app with:
 The UI lives in the root app and is deployed to Vercel.
 
 - Entry: [`app/page.js`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/app/page.js)
+- Layout metadata: [`app/layout.js`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/app/layout.js)
+- Manifest: [`app/manifest.js`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/app/manifest.js)
 - Shell: [`components/app-shell.js`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/components/app-shell.js)
+- PWA bootstrap: [`components/pwa-bootstrap.js`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/components/pwa-bootstrap.js)
 - Styling: [`app/globals.css`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/app/globals.css)
+- Service worker: [`public/sw.js`](/C:/Users/ribha/Documents/GitHub/ServerlessMediaResizer/public/sw.js)
+
+The frontend is now mobile-first:
+
+- bottom navigation on phones
+- larger touch targets and form controls
+- safer spacing for narrow screens
+- standalone app behavior when installed from Chrome
 
 ### Image workflow
 
@@ -55,6 +68,28 @@ Flow:
 5. The Python service runs structural cleanup first, then stronger compression passes only if needed.
 6. The service tries to get as close as possible under the requested target instead of over-compressing blindly.
 7. When the job completes, the frontend downloads the finished PDF from the backend.
+
+## PWA + mobile install
+
+The app now ships with:
+
+- a valid web app manifest
+- install icons for Android and Apple touch surfaces
+- standalone display mode
+- theme color and mobile browser metadata
+- a safe service worker that caches the app shell and static assets only
+
+How to install from Chrome on Android:
+
+1. Open [https://serverless-media-resizer.vercel.app](https://serverless-media-resizer.vercel.app)
+2. Tap the in-app `Install app` button if Chrome offers the prompt
+3. If no prompt appears, open the Chrome menu and choose `Add to Home screen`
+
+Notes:
+
+- Install prompting is best on Chrome/Chromium browsers
+- iPhone/iPad can still add the app manually with Safari `Share -> Add to Home Screen`
+- The service worker intentionally does not cache backend PDF job requests, so critical job state stays fresh
 
 ## Deployment layout
 

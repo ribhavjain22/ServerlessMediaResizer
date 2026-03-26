@@ -6,7 +6,8 @@ export function Dropzone({
   subtitle,
   buttonLabel,
   onFileSelect,
-  disabled
+  disabled,
+  hint
 }) {
   function handleInputChange(event) {
     const selectedFile = event.target.files?.[0];
@@ -41,6 +42,7 @@ export function Dropzone({
       </div>
       <h3>{title}</h3>
       <p>{subtitle}</p>
+      {hint ? <span className="dropzone-hint">{hint}</span> : null}
       <span className="dropzone-button">{buttonLabel}</span>
       <input type="file" accept={accept} hidden onChange={handleInputChange} disabled={disabled} />
     </label>

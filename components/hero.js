@@ -1,12 +1,12 @@
-export function Hero({ activeTab, setActiveTab }) {
+export function Hero({ activeTab, setActiveTab, activeTabMeta }) {
   return (
     <section className="hero hero-compact glass-panel">
       <div className="hero-copy compact-copy">
         <p className="eyebrow">Media utility, redesigned</p>
-        <h1>Use the tool first. Read the pitch later.</h1>
+        <h1>Open fast, tap comfortably, finish quickly.</h1>
         <p className="hero-text">
-          The active converter is right below. Images stay local, and PDFs run through a
-          cleaner service path with explicit modes.
+          The active workflow sits directly below. Images stay local, while PDFs run through a
+          background service built to survive longer jobs on mobile networks.
         </p>
         <div className="hero-actions">
           <button type="button" className="cta-primary" onClick={() => setActiveTab("image")}>
@@ -20,16 +20,16 @@ export function Hero({ activeTab, setActiveTab }) {
 
       <div className="hero-card compact-stats">
         <div className="hero-stat">
-          <span className="hero-stat-value">2</span>
-          <span className="hero-stat-label">Focused workflows</span>
+          <span className="hero-stat-value">{activeTabMeta.shortLabel}</span>
+          <span className="hero-stat-label">Current tool</span>
         </div>
         <div className="hero-stat">
           <span className="hero-stat-value">{activeTab === "image" ? "Local" : "API"}</span>
           <span className="hero-stat-label">Current processing path</span>
         </div>
         <div className="hero-stat">
-          <span className="hero-stat-value">Fresh</span>
-          <span className="hero-stat-label">UI and service architecture</span>
+          <span className="hero-stat-value">Ready</span>
+          <span className="hero-stat-label">{activeTabMeta.summary}</span>
         </div>
       </div>
     </section>

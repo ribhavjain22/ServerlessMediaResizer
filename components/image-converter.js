@@ -153,6 +153,7 @@ export function ImageConverter() {
           title="Drop an image into the studio"
           subtitle="Everything stays local. No upload step, no server queue."
           buttonLabel="Select image"
+          hint="Works well for quick phone edits before sharing."
           onFileSelect={loadFile}
         />
       ) : (
@@ -175,11 +176,23 @@ export function ImageConverter() {
           <div className="form-grid">
             <label className="field">
               <span>Width</span>
-              <input type="number" min="1" value={targetWidth} onChange={(event) => handleWidthChange(event.target.value)} />
+              <input
+                type="number"
+                min="1"
+                inputMode="numeric"
+                value={targetWidth}
+                onChange={(event) => handleWidthChange(event.target.value)}
+              />
             </label>
             <label className="field">
               <span>Height</span>
-              <input type="number" min="1" value={targetHeight} onChange={(event) => handleHeightChange(event.target.value)} />
+              <input
+                type="number"
+                min="1"
+                inputMode="numeric"
+                value={targetHeight}
+                onChange={(event) => handleHeightChange(event.target.value)}
+              />
             </label>
           </div>
 
