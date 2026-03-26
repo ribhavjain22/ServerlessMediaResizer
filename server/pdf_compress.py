@@ -1,10 +1,15 @@
+import gc
 import json
 import os
+import shutil
 import sys
 import tempfile
 
 import fitz
 from PIL import Image
+
+
+MAX_RASTER_PAGES = 24
 
 
 def file_size(path):
@@ -13,99 +18,132 @@ def file_size(path):
 
 def normalize_pdf(input_path, output_path):
     doc = fitz.open(input_path)
-    doc.save(output_path, garbage=4, deflate=True)
-    doc.close()
+    try:
+        doc.save(output_path, garbage=4, deflate=True)
+    finally:
+        doc.close()
 
 
 def rasterize_pdf(input_path, output_path, profile):
     source = fitz.open(input_path)
     output = fitz.open()
 
-    for page in source:
-        pix = page.get_pixmap(dpi=profile["dpi"], alpha=False)
-        new_page = output.new_page(width=page.rect.width, height=page.rect.height)
+    try:
+        for page in source:
+            pix = page.get_pixmap(dpi=profile["dpi"], alpha=False)
+            new_page = output.new_page(width=page.rect.width, height=page.rect.height)
 
-        if profile["format"] == "png":
-            image_bytes = pix.tobytes("png")
-        else:
-            image = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-            buffer = tempfile.SpooledTemporaryFile()
-            image.save(buffer, format="JPEG", quality=profile["quality"], optimize=True)
-            buffer.seek(0)
-            image_bytes = buffer.read()
-            buffer.close()
+            if profile["format"] == "png":
+                image_bytes = pix.tobytes("png")
+            else:
+                image = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                with tempfile.SpooledTemporaryFile() as buffer:
+                    image.save(buffer, format="JPEG", quality=profile["quality"], optimize=True)
+                    buffer.seek(0)
+                    image_bytes = buffer.read()
+                image.close()
 
-        new_page.insert_image(page.rect, stream=image_bytes)
+            new_page.insert_image(page.rect, stream=image_bytes)
 
-    output.save(output_path, garbage=4, deflate=True)
-    output.close()
-    source.close()
+            del image_bytes
+            del new_page
+            del pix
+            gc.collect()
+
+        output.save(output_path, garbage=4, deflate=True)
+    finally:
+        output.close()
+        source.close()
+        gc.collect()
 
 
 def choose_best(input_path, target_bytes, output_path=None):
     work_dir = tempfile.mkdtemp(prefix="pdf-compress-")
-    normalized_path = os.path.join(work_dir, "normalized.pdf")
-    normalize_pdf(input_path, normalized_path)
 
-    normalized_size = file_size(normalized_path)
-    if normalized_size <= target_bytes:
-        metadata = {
-            "strategy": "normalized",
-            "notes": ["metadata cleanup", "structural normalization", "target reached without rasterization"],
-        }
-        selected_path = normalized_path
-    else:
-        profiles = [
-            {"dpi": 200, "format": "png", "label": "lossless raster large"},
-            {"dpi": 170, "format": "png", "label": "lossless raster medium"},
-            {"dpi": 220, "format": "jpeg", "quality": 96, "label": "ultra quality raster"},
-            {"dpi": 190, "format": "jpeg", "quality": 94, "label": "very high quality raster"},
-            {"dpi": 170, "format": "jpeg", "quality": 90, "label": "high quality raster"},
-            {"dpi": 150, "format": "jpeg", "quality": 86, "label": "quality raster"},
-            {"dpi": 130, "format": "jpeg", "quality": 80, "label": "balanced raster"},
-            {"dpi": 110, "format": "jpeg", "quality": 72, "label": "medium raster"},
-            {"dpi": 96, "format": "jpeg", "quality": 64, "label": "compressed raster"},
-        ]
+    try:
+        normalized_path = os.path.join(work_dir, "normalized.pdf")
+        normalize_pdf(input_path, normalized_path)
 
-        below_target = []
-        best_effort_path = normalized_path
-        best_effort_size = normalized_size
-        best_effort_meta = {
-            "strategy": "normalized",
-            "notes": ["metadata cleanup", "structural normalization", "target not reached with non-raster pass"],
-        }
+        normalized_size = file_size(normalized_path)
+        normalized_doc = fitz.open(input_path)
+        try:
+            page_count = normalized_doc.page_count
+        finally:
+            normalized_doc.close()
 
-        for index, profile in enumerate(profiles):
-            attempt_path = os.path.join(work_dir, f"attempt-{index}.pdf")
-            rasterize_pdf(input_path, attempt_path, profile)
-            attempt_size = file_size(attempt_path)
+        if normalized_size <= target_bytes:
+            metadata = {
+                "strategy": "normalized",
+                "notes": ["metadata cleanup", "structural normalization", "target reached without rasterization"],
+            }
+            selected_path = normalized_path
+        elif page_count > MAX_RASTER_PAGES:
+            metadata = {
+                "strategy": "normalized",
+                "notes": [
+                    "metadata cleanup",
+                    "structural normalization",
+                    "raster pass skipped for large document to stay within hosted memory limits",
+                    "target could not be reached safely on the current backend tier",
+                ],
+            }
+            selected_path = normalized_path
+        else:
+            profiles = [
+                {"dpi": 150, "format": "jpeg", "quality": 84, "label": "quality raster"},
+                {"dpi": 130, "format": "jpeg", "quality": 78, "label": "balanced raster"},
+                {"dpi": 110, "format": "jpeg", "quality": 70, "label": "medium raster"},
+                {"dpi": 96, "format": "jpeg", "quality": 62, "label": "compressed raster"},
+                {"dpi": 84, "format": "jpeg", "quality": 56, "label": "aggressive raster"},
+            ]
 
-            meta = {
-                "strategy": profile["label"],
-                "notes": [f"pages converted to {profile['format'].upper()}-backed PDF", f"used {profile['label']}"],
+            best_under_target = None
+            best_effort_path = normalized_path
+            best_effort_size = normalized_size
+            best_effort_meta = {
+                "strategy": "normalized",
+                "notes": ["metadata cleanup", "structural normalization", "target not reached with non-raster pass"],
             }
 
-            if attempt_size < best_effort_size:
-                best_effort_path = attempt_path
-                best_effort_size = attempt_size
-                best_effort_meta = meta
+            for index, profile in enumerate(profiles):
+                attempt_path = os.path.join(work_dir, f"attempt-{index}.pdf")
+                rasterize_pdf(input_path, attempt_path, profile)
+                attempt_size = file_size(attempt_path)
 
-            if attempt_size <= target_bytes:
-                below_target.append((attempt_size, attempt_path, meta))
+                meta = {
+                    "strategy": profile["label"],
+                    "notes": [f"pages converted to {profile['format'].upper()}-backed PDF", f"used {profile['label']}"],
+                }
 
-        if below_target:
-            _, selected_path, metadata = max(below_target, key=lambda item: item[0])
-            metadata["notes"].append("selected the closest result under the requested target")
-        else:
-            selected_path = best_effort_path
-            metadata = best_effort_meta
-            metadata["notes"].append("target could not be reached without stronger compression")
+                if attempt_size < best_effort_size:
+                    if best_effort_path not in {normalized_path, attempt_path} and os.path.exists(best_effort_path):
+                        os.remove(best_effort_path)
+                    best_effort_path = attempt_path
+                    best_effort_size = attempt_size
+                    best_effort_meta = meta
+                elif os.path.exists(attempt_path):
+                    os.remove(attempt_path)
 
-    if output_path:
-        with open(selected_path, "rb") as source, open(output_path, "wb") as dest:
-            dest.write(source.read())
+                if attempt_size <= target_bytes:
+                    if not best_under_target or attempt_size > best_under_target[0]:
+                        best_under_target = (attempt_size, attempt_path, meta)
 
-    return metadata
+            if best_under_target:
+                _, selected_path, metadata = best_under_target
+                metadata["notes"].append("selected the closest result under the requested target")
+            else:
+                selected_path = best_effort_path
+                metadata = best_effort_meta
+                metadata["notes"].append("target could not be reached without stronger compression")
+
+        if output_path:
+            with open(selected_path, "rb") as source, open(output_path, "wb") as dest:
+                shutil.copyfileobj(source, dest)
+
+        return metadata
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
+        gc.collect()
 
 
 def main():

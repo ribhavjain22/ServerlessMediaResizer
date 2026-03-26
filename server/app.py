@@ -12,15 +12,18 @@ from flask_cors import CORS
 from pdf_compress import choose_best
 
 
-JOB_TTL_SECONDS = 60 * 60
+JOB_TTL_SECONDS = 10 * 60
+MAX_UPLOAD_BYTES = 25 * 1024 * 1024
 JOB_ROOT = Path(gettempdir()) / "serverless-media-resizer-jobs"
 JOB_ROOT.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
 CORS(app)
 
 jobs = {}
 jobs_lock = threading.Lock()
+processing_semaphore = threading.Semaphore(1)
 
 
 def build_job_paths(job_id):
@@ -50,7 +53,10 @@ def cleanup_expired_jobs():
 
 def update_job(job_id, **fields):
     with jobs_lock:
-        job = jobs[job_id]
+        job = jobs.get(job_id)
+        if not job:
+            return
+
         job.update(fields)
         job["updated_at"] = time.time()
 
@@ -62,22 +68,29 @@ def process_job(job_id):
     if not job:
         return
 
-    try:
-        metadata = choose_best(str(job["input_path"]), job["target_bytes"], str(job["output_path"]))
-        output_size = job["output_path"].stat().st_size
-        update_job(
-            job_id,
-            status="completed",
-            metadata=metadata,
-            output_size=output_size,
-        )
-    except Exception as exc:
-        app.logger.error("PDF compression failed for job %s:\n%s", job_id, traceback.format_exc())
-        update_job(
-            job_id,
-            status="failed",
-            error=f"PDF compression failed: {exc}",
-        )
+    with processing_semaphore:
+        update_job(job_id, status="processing")
+
+        try:
+            metadata = choose_best(str(job["input_path"]), job["target_bytes"], str(job["output_path"]))
+            output_size = job["output_path"].stat().st_size
+
+            if job["input_path"].exists():
+                job["input_path"].unlink()
+
+            update_job(
+                job_id,
+                status="completed",
+                metadata=metadata,
+                output_size=output_size,
+            )
+        except Exception as exc:
+            app.logger.error("PDF compression failed for job %s:\n%s", job_id, traceback.format_exc())
+            update_job(
+                job_id,
+                status="failed",
+                error=f"PDF compression failed: {exc}",
+            )
 
 
 def serialize_job(job_id, job):
@@ -126,13 +139,16 @@ def create_job():
     except (TypeError, ValueError):
         return jsonify({"error": "A valid target size is required."}), 400
 
+    if request.content_length and request.content_length > MAX_UPLOAD_BYTES:
+        return jsonify({"error": "PDF is too large for this hosted backend. Please try a file under 25 MB."}), 413
+
     job_id = uuid.uuid4().hex
     paths = build_job_paths(job_id)
     paths["dir"].mkdir(parents=True, exist_ok=True)
     uploaded_file.save(paths["input"])
 
     job = {
-        "status": "processing",
+        "status": "queued",
         "created_at": time.time(),
         "updated_at": time.time(),
         "job_dir": paths["dir"],
@@ -194,6 +210,13 @@ def download_job(job_id):
     response.headers["X-Original-Size"] = str(job["original_size"])
     response.headers["X-Output-Size"] = str(job["output_size"])
     response.headers["X-Target-Size"] = str(job["target_bytes"])
+
+    def cleanup_downloaded_job():
+        with jobs_lock:
+            jobs.pop(job_id, None)
+        shutil.rmtree(job["job_dir"], ignore_errors=True)
+
+    response.call_on_close(cleanup_downloaded_job)
     return response
 
 
