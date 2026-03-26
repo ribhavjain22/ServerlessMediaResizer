@@ -5,5 +5,5 @@ services:
     rootDir: server
     plan: starter
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --timeout 300
     autoDeploy: true

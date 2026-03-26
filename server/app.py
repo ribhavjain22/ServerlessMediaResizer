@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import traceback
 
 from pdf_compress import choose_best
 
@@ -31,26 +32,30 @@ def compress():
     except (TypeError, ValueError):
         return jsonify({"error": "A valid target size is required."}), 400
 
-    with TemporaryDirectory(prefix="pdf-api-") as temp_dir:
-        temp_path = Path(temp_dir)
-        input_path = temp_path / "input.pdf"
-        output_path = temp_path / "output.pdf"
+    try:
+        with TemporaryDirectory(prefix="pdf-api-") as temp_dir:
+            temp_path = Path(temp_dir)
+            input_path = temp_path / "input.pdf"
+            output_path = temp_path / "output.pdf"
 
-        uploaded_file.save(input_path)
-        metadata = choose_best(str(input_path), target_bytes, str(output_path))
+            uploaded_file.save(input_path)
+            metadata = choose_best(str(input_path), target_bytes, str(output_path))
 
-        response = send_file(
-            output_path,
-            mimetype="application/pdf",
-            as_attachment=True,
-            download_name=f"{Path(uploaded_file.filename).stem}-compressed.pdf",
-        )
-        response.headers["X-Compression-Strategy"] = metadata["strategy"]
-        response.headers["X-Compression-Notes"] = " | ".join(metadata["notes"])
-        response.headers["X-Original-Size"] = str(input_path.stat().st_size)
-        response.headers["X-Output-Size"] = str(output_path.stat().st_size)
-        response.headers["X-Target-Size"] = str(target_bytes)
-        return response
+            response = send_file(
+                output_path,
+                mimetype="application/pdf",
+                as_attachment=True,
+                download_name=f"{Path(uploaded_file.filename).stem}-compressed.pdf",
+            )
+            response.headers["X-Compression-Strategy"] = metadata["strategy"]
+            response.headers["X-Compression-Notes"] = " | ".join(metadata["notes"])
+            response.headers["X-Original-Size"] = str(input_path.stat().st_size)
+            response.headers["X-Output-Size"] = str(output_path.stat().st_size)
+            response.headers["X-Target-Size"] = str(target_bytes)
+            return response
+    except Exception as exc:
+        app.logger.error("PDF compression failed:\n%s", traceback.format_exc())
+        return jsonify({"error": f"PDF compression failed: {exc}"}), 500
 
 
 if __name__ == "__main__":
