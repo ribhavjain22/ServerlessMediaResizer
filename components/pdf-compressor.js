@@ -42,8 +42,8 @@ export function PdfCompressor() {
 
     try {
       setError("");
-      setStatus("Compressing PDF...");
       setLastResult(null);
+      setStatus("Uploading PDF...");
 
       const apiBaseUrl = resolvePdfApiBaseUrl();
       if (!apiBaseUrl) {
@@ -54,25 +54,39 @@ export function PdfCompressor() {
       formData.append("file", file);
       formData.append("targetBytes", String(targetBytes));
 
-      const response = await fetch(`${apiBaseUrl}/compress`, {
+      const createResponse = await fetch(`${apiBaseUrl}/jobs`, {
         method: "POST",
         body: formData
       });
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.error || "Compression request failed.");
+      const createdJob = await readJsonResponse(createResponse, "Could not start PDF compression.");
+      const jobId = createdJob.jobId;
+
+      if (!jobId) {
+        throw new Error("The PDF service did not return a job id.");
       }
 
-      const blob = await response.blob();
+      setStatus("Compressing PDF in the background...");
+      const finishedJob = await pollJob(apiBaseUrl, jobId, setStatus);
+
+      if (finishedJob.status !== "completed" || !finishedJob.result) {
+        throw new Error(finishedJob.error || "Compression did not finish successfully.");
+      }
+
+      setStatus("Preparing download...");
+      const downloadResponse = await fetch(`${apiBaseUrl}${finishedJob.result.downloadUrl}`);
+      if (!downloadResponse.ok) {
+        const payload = await downloadResponse.json().catch(() => ({}));
+        throw new Error(payload.error || "Could not download compressed PDF.");
+      }
+
+      const blob = await downloadResponse.blob();
       const downloadUrl = URL.createObjectURL(blob);
-      const outputSize = response.headers.get("X-Output-Size") || formatBytes(blob.size);
-      const originalSize = formatBytes(file.size);
-      const targetSize = formatBytes(targetBytes);
-      const strategy = response.headers.get("X-Compression-Strategy") || "best-match";
-      const notes = (response.headers.get("X-Compression-Notes") || "")
-        .split(" | ")
-        .filter(Boolean);
+      const strategy = downloadResponse.headers.get("X-Compression-Strategy") || finishedJob.result.strategy;
+      const notes =
+        (downloadResponse.headers.get("X-Compression-Notes") || "").split(" | ").filter(Boolean) ||
+        finishedJob.result.notes ||
+        [];
 
       const anchor = document.createElement("a");
       anchor.href = downloadUrl;
@@ -80,11 +94,12 @@ export function PdfCompressor() {
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
+      URL.revokeObjectURL(downloadUrl);
 
       setLastResult({
-        originalSize,
-        outputSize,
-        targetSize,
+        originalSize: formatBytes(finishedJob.result.originalSize ?? file.size),
+        outputSize: formatBytes(finishedJob.result.outputSize ?? blob.size),
+        targetSize: formatBytes(finishedJob.result.targetSize ?? targetBytes),
         strategy,
         notes
       });
@@ -194,6 +209,38 @@ export function PdfCompressor() {
       {error ? <p className="error-message">{error}</p> : null}
     </section>
   );
+}
+
+async function pollJob(apiBaseUrl, jobId, setStatus) {
+  const timeoutAt = Date.now() + 10 * 60 * 1000;
+
+  while (Date.now() < timeoutAt) {
+    await wait(2000);
+    const response = await fetch(`${apiBaseUrl}/jobs/${jobId}`);
+    const job = await readJsonResponse(response, "Could not read PDF compression status.");
+
+    if (job.status === "completed" || job.status === "failed") {
+      return job;
+    }
+
+    setStatus("Compressing PDF in the background...");
+  }
+
+  throw new Error("Compression is taking too long. Please try again.");
+}
+
+async function readJsonResponse(response, fallbackMessage) {
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || fallbackMessage);
+  }
+  return payload;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
 }
 
 function formatBytes(bytes) {

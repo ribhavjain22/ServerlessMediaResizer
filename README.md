@@ -49,11 +49,12 @@ PDFs are processed by the external Python backend on Render.
 Flow:
 
 1. The user uploads a PDF and picks a target size preset such as `Under 1 MB` or `Under 2 MB`.
-2. The frontend sends the file to the URL set in `NEXT_PUBLIC_PDF_API_URL`.
-3. The Render backend temporarily stores the upload.
-4. The Python service runs structural cleanup first, then stronger compression passes only if needed.
-5. The service tries to get as close as possible under the requested target instead of over-compressing blindly.
-6. The compressed PDF is streamed back to the browser as a download.
+2. The frontend creates a compression job at the URL set in `NEXT_PUBLIC_PDF_API_URL`.
+3. The Render backend stores the upload and starts processing in the background.
+4. The frontend polls the job status instead of holding one long request open.
+5. The Python service runs structural cleanup first, then stronger compression passes only if needed.
+6. The service tries to get as close as possible under the requested target instead of over-compressing blindly.
+7. When the job completes, the frontend downloads the finished PDF from the backend.
 
 ## Deployment layout
 
