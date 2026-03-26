@@ -62,6 +62,17 @@ export function ImageConverter() {
     document.body.removeChild(anchor);
   }
 
+  function downloadBlob(blob, fileName) {
+    const downloadUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = downloadUrl;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(downloadUrl);
+  }
+
   function handleWidthChange(value) {
     setTargetWidth(value);
     if (!keepAspectRatio || !imageState || !value) {
@@ -119,7 +130,7 @@ export function ImageConverter() {
       setError("");
       setStatus("Reducing image size...");
       const reduced = await reduceImageToTargetSize(imageState.file, targetBytes);
-      downloadDataUrl(reduced, `${stripExtension(imageState.name)}-${targetBytes}.jpg`);
+      downloadBlob(reduced.blob, `${stripExtension(imageState.name)}-${targetBytes}.${reduced.extension}`);
       setStatus("Reduced image downloaded.");
     } catch (nextError) {
       setStatus("");
