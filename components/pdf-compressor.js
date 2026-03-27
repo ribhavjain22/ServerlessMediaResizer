@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Dropzone } from "@/components/dropzone";
 
 const targetOptions = [
@@ -16,11 +16,28 @@ export function PdfCompressor() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [lastResult, setLastResult] = useState(null);
+  const hasWarmedBackend = useRef(false);
 
   const selectedTarget = useMemo(
     () => targetOptions.find((option) => option.value === targetBytes) ?? targetOptions[1],
     [targetBytes]
   );
+
+  useEffect(() => {
+    const apiBaseUrl = resolvePdfApiBaseUrl();
+    if (!apiBaseUrl || hasWarmedBackend.current) {
+      return;
+    }
+
+    hasWarmedBackend.current = true;
+
+    fetch(`${apiBaseUrl}/health`, {
+      method: "GET",
+      cache: "no-store"
+    }).catch(() => {
+      hasWarmedBackend.current = false;
+    });
+  }, []);
 
   function handleFileSelect(nextFile) {
     if (nextFile.type !== "application/pdf") {
@@ -131,7 +148,7 @@ export function PdfCompressor() {
           title="Drop a PDF into the lab"
           subtitle="Pick the maximum size you can tolerate and the service will stop at the highest quality under that limit."
           buttonLabel="Select PDF"
-          hint="Uploads once, then keeps processing as a background job."
+          hint="The backend is nudged awake when you open PDF Lab, then your upload runs as a background job."
           onFileSelect={handleFileSelect}
         />
       ) : (
